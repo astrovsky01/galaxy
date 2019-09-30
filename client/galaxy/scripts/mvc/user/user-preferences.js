@@ -10,7 +10,7 @@ import Ui from "mvc/ui/ui-misc";
 import QueryStringParsing from "utils/query-string-parsing";
 
 /** Contains descriptive dictionaries describing user forms */
-const Model = Backbone.Model.extend({
+var Model = Backbone.Model.extend({
     initialize: function(options) {
         const Galaxy = getGalaxyInstance();
         options = options || {};
@@ -19,7 +19,7 @@ const Model = Backbone.Model.extend({
             user_id: options.user_id,
             information: {
                 title: _l("Manage information"),
-                description: "Edit your email, addresses and custom parameters or change your public name.",
+                description: "Edit your email, addresses and custom parameters or change your username.",
                 url: `api/users/${options.user_id}/information/inputs`,
                 icon: "fa-user",
                 redirect: "user"
@@ -90,15 +90,6 @@ const Model = Backbone.Model.extend({
                 submit_title: "Create a new key",
                 submit_icon: "fa-check"
             },
-            cloud_auth: {
-                title: _l("Manage Cloud Authorization"),
-                description: _l(
-                    "Add or modify the configuration that grants Galaxy to access your cloud-based resources."
-                ),
-                icon: "fa-cloud",
-                submit_title: "Create a new key",
-                submit_icon: "fa-check"
-            },
             toolbox_filters: {
                 title: _l("Manage Toolbox filters"),
                 description: _l("Customize your Toolbox by displaying or omitting sets of Tools."),
@@ -121,6 +112,23 @@ const Model = Backbone.Model.extend({
                 icon: "fa-openid",
                 onclick: function() {
                     window.location.href = `${getAppRoot()}openid/openid_auth?openid_provider=genomespace`;
+                }
+            },
+            notifications: {
+              title: _l("Enable notifications"),
+              description: _l("Allow push and tab notifcations on job completion/failure"),
+              icon: "fa-plus-square-o",
+              onclick: function() {
+                 Notification.requestPermission().then(function (permission) {
+                  //If the user accepts, let's create a notification
+                  if (permission === "granted") {
+                      new Notification("Notifications enabled", {
+                      icon: "static/favicon.ico"
+                            });
+                        } else {
+                            alert("Notifications disabled, please re-enable through browser settings.")
+                        }
+                    });
                 }
             },
             logout: {
@@ -149,7 +157,7 @@ const Model = Backbone.Model.extend({
 });
 
 /** View of the main user preference panel with links to individual user forms */
-const View = Backbone.View.extend({
+var View = Backbone.View.extend({
     title: _l("User Preferences"),
     active_tab: "user",
     initialize: function() {
@@ -159,48 +167,49 @@ const View = Backbone.View.extend({
     },
 
     render: function() {
+        var self = this;
         const Galaxy = getGalaxyInstance();
-        const config = Galaxy.config;
+        var config = Galaxy.config;
         $.getJSON(`${getAppRoot()}api/users/${Galaxy.user.id}`, data => {
-            this.$preferences = $("<div/>")
+            self.$preferences = $("<div/>")
                 .append($("<h2/>").append("User preferences"))
                 .append($("<p/>").append(`You are logged in as <strong>${_.escape(data.email)}</strong>.`))
-                .append((this.$table = $("<table/>")));
-            const message = QueryStringParsing.get("message");
-            const status = QueryStringParsing.get("status");
+                .append((self.$table = $("<table/>")));
+            var message = QueryStringParsing.get("message");
+            var status = QueryStringParsing.get("status");
             if (message && status) {
-                this.$preferences.prepend(new Ui.Message({ message: message, status: status }).$el);
+                self.$preferences.prepend(new Ui.Message({ message: message, status: status }).$el);
             }
             if (!config.use_remote_user) {
-                this._addLink("information");
-                this._addLink("password");
+                self._addLink("information");
+                self._addLink("password");
             }
             if (config.enable_communication_server) {
-                this._addLink("communication");
+                self._addLink("communication");
             }
-            this._addLink("custom_builds");
-            this._addLink("permissions");
-            this._addLink("make_data_private");
-            this._addLink("api_key");
-            this._addLink("cloud_auth");
+            self._addLink("custom_builds");
+            self._addLink("permissions");
+            self._addLink("make_data_private");
+            self._addLink("api_key");
+            self._addLink("notifications")
             if (config.enable_openid) {
-                this._addLink("genomespace");
+                self._addLink("genomespace");
             }
             if (config.has_user_tool_filters) {
-                this._addLink("toolbox_filters");
+                self._addLink("toolbox_filters");
             }
             if (Galaxy.session_csrf_token) {
-                this._addLink("logout");
+                self._addLink("logout");
             }
-            this.$preferences.append(this._templateFooter(data));
-            this.$el.empty().append(this.$preferences);
+            self.$preferences.append(self._templateFooter(data));
+            self.$el.empty().append(self.$preferences);
         });
     },
 
     _addLink: function(action) {
-        const options = this.model.get(action);
-        const $row = $(this._templateLink(options));
-        const $a = $row.find("a");
+        var options = this.model.get(action);
+        var $row = $(this._templateLink(options));
+        var $a = $row.find("a");
         if (options.onclick) {
             $a.on("click", () => {
                 options.onclick();
