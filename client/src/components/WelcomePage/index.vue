@@ -50,7 +50,7 @@
                             <b-row class="justify-content-md-center">
                                 <div v-for="(subtopic, subtopic_index) in subject.subtopics">
                                     <b-card-group style="height: 30rem">
-                                        <b-card class="text-center" body-class="d-flex flex-column" style="width: 15rem;">
+                                        <b-card class="text-center" body-class="d-flex flex-column" style="width: 15rem; height: 55vh;">
                                             <b-card-header style="height: 6rem; text-align: center; align-v: bottom;">
                                                 <h4>
                                                     {{ subtopic.title }}
@@ -60,13 +60,14 @@
                                             <b-card-img height="200vh" :src="imgUrl(subtopic.image)"></b-card-img>
                                             <br/>
                                             <b-card-text>{{ subtopic.intro }}</b-card-text>
-                                            <b-button class="mt-auto" variant="primary" @click="showTopic(subject_index); showCarousel(subtopic_index); menuCard=1;">Learn more</b-button>
+                                            <b-button class="mt-auto" variant="primary" @click="showTopic(subject_index); showCarousel(2 /*subtopic_index*/); menuCard=1;">Learn more</b-button>
                                         </b-card>
                                     </b-card-group>
                                 </div>
                             </b-row>
                             <br/>
                             <b-card-footer>
+                                <br/>
                                 <b-button class="mt-auto" variant="primary" @click="showPanel(0); menuCard = 0;">Return</b-button>
                             </b-card-footer>
                         </b-card>
@@ -82,38 +83,36 @@
                     <b-tab :title="subject.title">
                         <!-- Tabs for carousel topics -->
                         <b-tabs v-model="carouselTab">
-                            <div v-for="(subtopic, sub_index) in subject.subtopics">
-                                <b-tab :title="subtopic.title">
-                                    <b-card class="text-center">
-                                        <b-card-header>
-                                            <h4>
-                                                {{ subtopic.header }}
-                                            </h4>
-                                        </b-card-header>
-                                        <b-carousel id="data-importer" 
-                                            controls
-                                            indicators
-                                            :interval="0"
-                                            no-animation
-                                            align='center'
-                                        >
-                                            <div v-for="slide in subtopic.slides">
-                                                <b-carousel-slide :class="slide[1]" :img-src="imgUrl(slide[0])" :alt="slide[2]">
-                                                    <h4>{{ slide[3] }}</h4>
-                                                    </br>
-                                                </b-carousel-slide>    
-                                            </div>
-                                            <b-carousel-slide class="large-img" :img-src="imgUrl('static/images/new_user_welcome/galaxy_logo.png')" img-alt="Galaxy logo"> 
-                                                <h4>Enjoy using Galaxy!</h4>
-                                                <br/>
-                                            </b-carousel-slide>
-                                        </b-carousel>
-                                        <b-card-footer>
-                                            <b-button class="mt-auto" variant="primary" @click="menuCard = 0; showPanel(i+1);">Return</b-button>
-                                        </b-card-footer>
-                                    </b-card>
+                            <b-tab  v-for="(subtopic, sub_index) in subject.subtopics" :key="title" :title="subtopic.title">
+                                <b-card class="text-center">
+                                    <b-card-header>
+                                        <h4>
+                                            {{ subtopic.header }}
+                                        </h4>
+                                    </b-card-header>
+                                    <b-carousel id="data-importer" 
+                                        controls
+                                        indicators
+                                        :interval="0"
+                                        no-animation
+                                        align='center'
+                                    >
+                                        <div v-for="slide in subtopic.slides">
+                                            <b-carousel-slide :class="slide[1]" :img-src="imgUrl(slide[0])" :alt="slide[2]">
+                                                <h4>{{ slide[3] }}</h4>
+                                                <br />
+                                            </b-carousel-slide>    
+                                        </div>
+                                        <b-carousel-slide class="large-img" :img-src="imgUrl('static/images/new_user_welcome/galaxy_logo.png')" img-alt="Galaxy logo"> 
+                                            <h4>Enjoy using Galaxy!</h4>
+                                            <br />
+                                        </b-carousel-slide>
+                                    </b-carousel>
+                                    <b-card-footer>
+                                        <b-button class="mt-auto" variant="primary" @click="menuCard = 0; showPanel(i+1);">Return</b-button>
+                                    </b-card-footer>
+                                </b-card>
                                 </b-tab>
-                            </div>  
                         </b-tabs>
                     </b-tab>
                 </div>
@@ -390,9 +389,9 @@ export default {
 
 </script>
 <style type="text/css">
-    .nav-tabs {
+    /* .nav-tabs {
         display: none;
-    }
+    } */
     .carousel-caption {
         position: relative;
         left: 0;

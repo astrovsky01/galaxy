@@ -49,6 +49,8 @@ import { CloudAuth } from "components/User/CloudAuth";
 import { ExternalIdentities } from "components/User/ExternalIdentities";
 import Vue from "vue";
 import store from "store";
+import WelcomePage from "components/WelcomePage";
+import { mountVueComponent } from "utils/mountVueComponent";
 
 /** Routes */
 export const getAnalysisRouter = (Galaxy) =>
@@ -383,7 +385,7 @@ export const getAnalysisRouter = (Galaxy) =>
             if (params.tool_id || params.job_id) {
                 if (params.tool_id === "upload1") {
                     this.page.toolPanel.upload.show();
-                    this._loadCenterIframe("welcome");
+                    this.mountWelcome("welcome");
                 } else {
                     this._loadToolForm(params);
                 }
@@ -396,9 +398,14 @@ export const getAnalysisRouter = (Galaxy) =>
                     this._loadCenterIframe(`${params.m_c}/${params.m_a}`);
                     // show the workflow run form
                 } else {
-                    this._loadCenterIframe("welcome");
+                    this.mountWelcome("welcome");
                 }
             }
+        },
+
+        mountWelcome(){
+            this._display_vue_helper(WelcomePage, {});
+            // this._loadCenterIframe("welcome");
         },
 
         /** load the center panel with a tool form described by the given params obj */
